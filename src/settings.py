@@ -7,6 +7,7 @@ initialized as enviornment variables. Each environment type depend on the
 """
 import os
 from abc import ABC, abstractmethod
+from contextlib import suppress
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 WORKING_DIR = os.path.abspath(os.path.join(BASE_DIR, os.pardir))
@@ -41,6 +42,10 @@ class BaseConfig(ABC):
     STATIC_FOLDER = "static"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TEMPLATES_FOLDER = "templates"
+
+    def __init__(self):
+        with suppress(FileExistsError):
+            os.makedirs(TEMP_DIR)
 
     @property
     @abstractmethod
@@ -82,6 +87,7 @@ class DevelopmentConfig(BaseConfig):
     Attributes:
         DATABASE_URI (str): Database URI path.
         DEBUG (bool): Enable debug.
+        LOGGING_LEVEL (int): Logging level.
         TESTING (bool): Enable testing.
 
     """
@@ -103,6 +109,7 @@ class TestingConfig(BaseConfig):
     Attributes:
         DATABASE_URI (str): Database URI path.
         DEBUG (bool): Enable debug.
+        LOGGING_LEVEL (int): Logging level.
         TESTING (bool): Enable testing.
         WTF_CSRF_ENABLED (str): Disable CSRF protect.
 
@@ -126,6 +133,7 @@ class ProductionConfig(BaseConfig):
     Attributes:
         DATABASE_URI (str): Database URI path.
         DEBUG (bool): Enable debug.
+        LOGGING_LEVEL (int): Logging level.
         TESTING (bool): Enable testing.
 
     """
@@ -136,7 +144,7 @@ class ProductionConfig(BaseConfig):
 
 
 config = {
-    "production": ProductionConfig(),
-    "development": DevelopmentConfig(),
-    "testing": TestingConfig(),
+    "production": ProductionConfig,
+    "development": DevelopmentConfig,
+    "testing": TestingConfig,
 }
