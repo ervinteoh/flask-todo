@@ -27,13 +27,14 @@ def create_app():
         Flask: The Flask application instance.
     """
     app = Flask(__name__)
-    config = settings.config[app.config["ENV"]]
-    app.config.from_object(config())
+    config = settings.config[app.config["ENV"]]()
+    app.config.from_object(config)
     app.url_map.strict_slashes = False
 
     register_extensions(app)
     register_blueprints(app)
     register_shellcontext(app)
+    configure_logger(app, config)
 
     return app
 
@@ -67,3 +68,16 @@ def register_shellcontext(app: Flask):
     shell_context = {"db": extensions.db}
 
     app.shell_context_processor(lambda: shell_context)
+
+
+def configure_logger(app: Flask, config: settings.BaseConfig):
+    """Configure logger.
+
+    Args:
+        app (Flask): The flask application instance.
+        config (settings.BaseConfig): The configuration settings.
+    """
+    app.logger.handlers = []
+    app.logger.addHandler(config.console_handler)
+    if config.file_handler:
+        app.logger.addHandler(config.file_handler)

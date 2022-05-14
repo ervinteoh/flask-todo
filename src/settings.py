@@ -5,9 +5,12 @@ initialized as enviornment variables. Each environment type depend on the
 `FLASK_ENV` environment variable defined.
 
 """
+from datetime import datetime
+import logging
 import os
 from abc import ABC, abstractmethod
 from contextlib import suppress
+import sys
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 WORKING_DIR = os.path.abspath(os.path.join(BASE_DIR, os.pardir))
@@ -29,6 +32,9 @@ class BaseConfig(ABC):
         application environment.
 
     Attributes:
+        LOGGING_FILE (bool): Enable log to file.
+        LOGGING_FORMAT(str): Logging format.
+        LOGGING_LEVEL(int): Logging level.
         SECRET_KEY (str): Protection against cookie data tampering.
         STATIC_FOLDER (str): Static folder location.
         SQLALCHEMY_TRACK_MODIFICATIONS (str): Disable SQLAlchemy warnings.
@@ -38,14 +44,19 @@ class BaseConfig(ABC):
 
     # pylint: disable=too-few-public-methods, invalid-name
 
+    LOGGING_FILE = False
+    LOGGING_FORMAT = (
+        "%(asctime)s %(levelname)-8s %(message)s (%(filename)s:%(lineno)d)"
+    )
+    LOGGING_LEVEL = logging.WARNING
     SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24))
     STATIC_FOLDER = "static"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     TEMPLATES_FOLDER = "templates"
 
     def __init__(self):
-        with suppress(FileExistsError):
-            os.makedirs(TEMP_DIR)
+        if not os.path.exists(TEMP_DIR):
+            os.mkdir(TEMP_DIR)
 
     @property
     @abstractmethod
@@ -74,6 +85,44 @@ class BaseConfig(ABC):
         """
         return f"sqlite:///{self.DATABASE_URI}"
 
+    @property
+    def console_handler(self):
+        """Logging stream handler for the console.
+
+        Returns:
+            logging.StreamHandler: The stream handler.
+        """
+        format = logging.Formatter(self.LOGGING_FORMAT)
+
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setLevel(self.LOGGING_LEVEL)
+        handler.setFormatter(format)
+        return handler
+
+    @property
+    def file_handler(self):
+        """Logging file handler.
+
+        The file handler will return None depending on the variable
+        `LOGGING_FILE`.
+
+        Returns:
+            logging.FileHandler: The logging file handler.
+        """
+        if not self.LOGGING_FILE:
+            return None
+        directory = os.path.join(TEMP_DIR, "logs")
+        filename = datetime.now().strftime("%Y-%m-%d.log")
+        filepath = os.path.join(directory, filename)
+        if not os.path.exists(directory):
+            os.mkdir(directory)
+        format = logging.Formatter(self.LOGGING_FORMAT)
+
+        handler = logging.FileHandler(filepath)
+        handler.setLevel(self.LOGGING_LEVEL)
+        handler.setFormatter(format)
+        return handler
+
 
 class DevelopmentConfig(BaseConfig):
     """Development configuration for the application.
@@ -85,13 +134,14 @@ class DevelopmentConfig(BaseConfig):
         $ export FLASK_ENV=development
 
     Attributes:
+        LOGGING_LEVEL (int): Logging level.
         DATABASE_URI (str): Database URI path.
         DEBUG (bool): Enable debug.
-        LOGGING_LEVEL (int): Logging level.
         TESTING (bool): Enable testing.
 
     """
 
+    LOGGING_LEVEL = logging.DEBUG
     DATABASE_URI = os.path.join(TEMP_DIR, "development.db")
     DEBUG = True
     TESTING = False
@@ -107,14 +157,15 @@ class TestingConfig(BaseConfig):
         $ export FLASK_ENV=testing
 
     Attributes:
+        LOGGING_LEVEL (int): Logging level.
         DATABASE_URI (str): Database URI path.
         DEBUG (bool): Enable debug.
-        LOGGING_LEVEL (int): Logging level.
         TESTING (bool): Enable testing.
         WTF_CSRF_ENABLED (str): Disable CSRF protect.
 
     """
 
+    LOGGING_LEVEL = logging.INFO
     DATABASE_URI = ":memory:"
     DEBUG = True
     TESTING = True
@@ -133,7 +184,6 @@ class ProductionConfig(BaseConfig):
     Attributes:
         DATABASE_URI (str): Database URI path.
         DEBUG (bool): Enable debug.
-        LOGGING_LEVEL (int): Logging level.
         TESTING (bool): Enable testing.
 
     """
@@ -141,6 +191,7 @@ class ProductionConfig(BaseConfig):
     DATABASE_URI = os.path.join(TEMP_DIR, "production.db")
     DEBUG = False
     TESTING = False
+    LOGGING_FILE = True
 
 
 config = {
