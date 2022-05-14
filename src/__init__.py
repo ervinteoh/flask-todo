@@ -77,7 +77,8 @@ def configure_logger(app: Flask, config: settings.BaseConfig):
         app (Flask): The flask application instance.
         config (settings.BaseConfig): The configuration settings.
     """
-    app.logger.handlers = []
+    app.logger.handlers.clear()
+    app.logger.propagate = False
     app.logger.addHandler(config.console_handler)
     if config.file_handler:
         app.logger.addHandler(config.file_handler)
