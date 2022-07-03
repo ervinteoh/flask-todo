@@ -49,9 +49,7 @@ class BaseConfig(ABC):
     # pylint: disable=too-few-public-methods, invalid-name
 
     LOGGING_FILE = False
-    LOGGING_FORMAT = (
-        "%(asctime)s %(levelname)-8s %(message)s (%(filename)s:%(lineno)d)"
-    )
+    LOGGING_FORMAT = "%(asctime)s %(levelname)-8s %(message)s (%(filename)s:%(lineno)d)"
     LOGGING_LEVEL = logging.WARNING
     SECRET_KEY = os.environ.get("SECRET_KEY", os.urandom(24))
     STATIC_FOLDER = "static"

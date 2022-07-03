@@ -39,7 +39,7 @@ def create_app() -> Flask:
 
     Returns
     -------
-    Flask
+    flask.app.Flask
         The Flask application instance.
     """
     app = Flask(__name__)
@@ -60,7 +60,7 @@ def register_extensions(app: Flask):
 
     Parameters
     ----------
-    app : Flask
+    app : flask.app.Flask
         The application instance.
     """
     extensions.bcrypt.init_app(app)
@@ -75,7 +75,7 @@ def register_blueprints(app: Flask):
 
     Parameters
     ----------
-    app : Flask
+    app : flask.app.Flask
         The application instance.
     """
     app.register_blueprint(public.blueprint)
@@ -89,7 +89,7 @@ def register_shellcontext(app: Flask):
 
     Parameters
     ----------
-    app : Flask
+    app : flask.app.Flask
         The application instance.
     """
     shell_context = {"db": extensions.db}
@@ -102,7 +102,7 @@ def configure_logger(app: Flask, config: settings.BaseConfig):
 
     Parameters
     ----------
-    app : Flask
+    app : flask.app.Flask
         The flask application instance.
     config : settings.BaseConfig
         The configuration settings.
