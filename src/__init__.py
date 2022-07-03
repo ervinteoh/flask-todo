@@ -1,30 +1,46 @@
 """Flask application entrypoint.
 
-This module defines the flask application factory function which creates the
-application. There are multiple ways to run the flask application. Please
-follow the following steps to start the application.
+This module defines the flask application factory functions which
+creates the application instance. The factory pattern allows for a more
+organized project structure and avoid circular imports. If the
+application instance is needed in another module, use::
 
-Example:
-    Execute these commands on a terminal to first initialize the required
-    environmental variables and run the application::
+    from flask import current_app
 
-        $ export FLASK_APP=src:create_app()
-        $ flask run
+There are multiple ways to run the flask application. Please follow the
+following steps to start the application.
 
-.. _Quickstart - Flask Documentation:
-   https://flask.palletsprojects.com/en/2.1.x/quickstart/
+Example
+-------
+Execute these commands on a terminal to first initialize the required
+environmental variables and run the application::
 
+    $ export FLASK_APP=src:create_app()
+    $ flask run
+
+Notes
+-----
+There are more information explaning all the available environmental
+variables in the `settings.py` module.
 """
+
 from flask import Flask
 
-from src import settings, extensions, public
+from src import extensions, settings
+from src.views import public
 
 
-def create_app():
-    """App factory function.
+def create_app() -> Flask:
+    """Application factory function.
 
-    Returns:
-        Flask: The Flask application instance.
+    The application's configurations are dependent on the environmental
+    variables `FLASK_ENV`. Please read `settings.py` for more
+    information.
+
+    Returns
+    -------
+    Flask
+        The Flask application instance.
     """
     app = Flask(__name__)
     config = settings.config[app.config["ENV"]]()
@@ -40,11 +56,12 @@ def create_app():
 
 
 def register_extensions(app: Flask):
-    """Register flask extensions.
+    """Register Flask extensions.
 
-    Args:
-        app (Flask): The flask application instance.
-
+    Parameters
+    ----------
+    app : Flask
+        The application instance.
     """
     extensions.bcrypt.init_app(app)
     extensions.db.init_app(app)
@@ -54,16 +71,26 @@ def register_extensions(app: Flask):
 
 
 def register_blueprints(app: Flask):
-    """Register Flask blueprints."""
-    app.register_blueprint(public.routes.blueprint)
+    """Register Flask blueprints.
+
+    Parameters
+    ----------
+    app : Flask
+        The application instance.
+    """
+    app.register_blueprint(public.blueprint)
 
 
 def register_shellcontext(app: Flask):
     """Register shell context objects.
 
-    Args:
-        app (Flask): The flask application instance.
+    This function registers the subsequent classes to be used in Flask
+    command line interface.
 
+    Parameters
+    ----------
+    app : Flask
+        The application instance.
     """
     shell_context = {"db": extensions.db}
 
@@ -73,9 +100,12 @@ def register_shellcontext(app: Flask):
 def configure_logger(app: Flask, config: settings.BaseConfig):
     """Configure logger.
 
-    Args:
-        app (Flask): The flask application instance.
-        config (settings.BaseConfig): The configuration settings.
+    Parameters
+    ----------
+    app : Flask
+        The flask application instance.
+    config : settings.BaseConfig
+        The configuration settings.
     """
     app.logger.handlers.clear()
     app.logger.propagate = False

@@ -7,7 +7,9 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
-   src.public
+   src.models
+   src.services
+   src.views
 
 Submodules
 ----------
@@ -27,7 +29,6 @@ src.settings module
    :members:
    :undoc-members:
    :show-inheritance:
-   :noindex:
 
 Module contents
 ---------------

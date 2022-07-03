@@ -1,13 +1,13 @@
-src.public package
-==================
+src.views package
+=================
 
 Submodules
 ----------
 
-src.public.routes module
-------------------------
+src.views.public module
+-----------------------
 
-.. automodule:: src.public.routes
+.. automodule:: src.views.public
    :members:
    :undoc-members:
    :show-inheritance:
@@ -15,7 +15,7 @@ src.public.routes module
 Module contents
 ---------------
 
-.. automodule:: src.public
+.. automodule:: src.views
    :members:
    :undoc-members:
    :show-inheritance:

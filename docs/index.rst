@@ -10,7 +10,7 @@ Welcome to Flask Ecommerce's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   modules
+   code/src
 
 
 Indices and tables

@@ -1,7 +1,15 @@
-"""Extensions module.
+"""Extensions initialization.
 
-Each extension is initialized in the app factory located in __init__.py.
+This module initializes all the Flask extensions used in the
+application. The extension is initialized in the application instance
+in the application factory method `register_extensions`.
+
+Notes
+-----
+Do not define any functions in this module. This module's only purpose
+is initializing the extensions required for the application.
 """
+
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager
 from flask_migrate import Migrate
