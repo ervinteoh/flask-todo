@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Flask Ecommerce'
+project = 'Flask Todo'
 copyright = '2022, Jie Sheng Teoh'
 author = 'Jie Sheng Teoh'
 

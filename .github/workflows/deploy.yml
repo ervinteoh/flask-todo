@@ -1,0 +1,19 @@
+name: Sphinx Documentation Continuous Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make -C docs html
+      - uses: JamesIves/github-pages-deploy-action@4.1.7
+        with:
+          branch: documentation # The branch the action should deploy to.
+          folder: docs/_build # The folder the action should deploy.
